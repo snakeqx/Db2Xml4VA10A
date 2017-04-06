@@ -1,7 +1,13 @@
 <component name="ProjectDictionaryState">
   <dictionary name="Administrator">
     <words>
+      <w>asctime</w>
       <w>functionstable</w>
+      <w>functionstatus</w>
+      <w>levelname</w>
+      <w>lineno</w>
+      <w>servicereportstable</w>
+      <w>starttime</w>
     </words>
   </dictionary>
 </component>
