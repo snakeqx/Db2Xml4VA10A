@@ -1,11 +1,11 @@
 StringFunctionTables = [
-    "Adj_PHS",                              # 1
-    "Adj_RSA",                              # 2
-    "Adj_FAD",                              # 3
-    "Adj_GET",                              # 4
-    "Adj_ZAD",                              # 5
-    "Tbg_DefChan",
-    "Adj_FAL",
+    "Adj_PHS",                              # 0
+    "Adj_RSA",                              # 1
+    "Adj_FAD",                              # 2
+    "Adj_GET",                              # 3
+    "Adj_ZAD",                              # 4
+    "Tbg_DefChan",                          # 5
+    "Adj_FAL",                              # 6
     "Adj_GAD",
     "Adj_DSC",
     "Tbg_AirCal",

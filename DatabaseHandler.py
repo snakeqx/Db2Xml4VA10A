@@ -31,7 +31,8 @@ class DatabaseHandler:
             return
         self.Connection = sqlite3.connect(self.Database_Name)
         logging.debug(r"Database connected")
-        self.read_data(StringFunctionTables[4])
+        for str_functions in StringFunctionTables:
+            self.read_data(str_functions)
         self.Connection.close()
 
     def read_data(self, function_type):
@@ -44,8 +45,16 @@ class DatabaseHandler:
         try:
             sql_cursor.execute(sql_string, [function_type])
             result = sql_cursor.fetchone()
-            self.parse_xml(result[0].decode())
-            logging.info(r"Read data successfully.")
+            if result is None:
+                logging.warning(function_type + r" with SUCCESS result has not been found.!!!!!!!!!!")
+                return
+            else:
+                while not self.parse_xml(result[0].decode()):
+                    result = sql_cursor.fetchone()
+                    if result is None:
+                        logging.warning(function_type + r" has no <Content>, please double check!")
+                        break
+                logging.info(r"Read data successfully.")
         except sqlite3.Error as e:
             logging.error(str(e))
         finally:
@@ -56,7 +65,11 @@ class DatabaseHandler:
         for node in xml_tree:
             if node.tag == "Chapter":
                 content_tag = node.find("Downloadable/Content")
-                logging.info(base64.b64decode(content_tag.text))
+                if content_tag is not None:
+                    logging.info(r"<Content> has been found.")
+                    return True
+        logging.debug(r"It seems this data has no <Content> node. Skip")
+        return False
 
 
 if __name__ == '__main__':
