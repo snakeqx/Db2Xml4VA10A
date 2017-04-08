@@ -69,6 +69,6 @@ class DirectoryHandler:
 
 
 if __name__ == '__main__':
-    a = DirectoryHandler(r"E:\Programming\Python\Db2Xml4VA10A_Data", "report.db")
+    a = DirectoryHandler(r".\data\", "report.db")
     print(a.Database_File_Path)
 

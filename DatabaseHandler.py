@@ -4,13 +4,13 @@ import logging
 import sqlite3
 from xml.etree import ElementTree
 from EnumFunctionTable import StringFunctionTables
-# import base64
+import base64
 
 # define the logging config, output in file
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                     datefmt='%a, %d %b %Y %H:%M:%S',
-                    filename=r'.\log\DatabaseHandler.log',
+                    filename=r'./log/DatabaseHandler.log',
                     filemode='w')
 # define a stream that will show log level > Warning on screen also
 console = logging.StreamHandler()
@@ -32,6 +32,7 @@ class DatabaseHandler:
             return
         self.Connection = sqlite3.connect(self.Database_Name)
         logging.debug(r'Database connected')
+        self.get_serial_number()
         for str_functions in StringFunctionTables:
             self.read_data(str_functions)
         self.Connection.close()
@@ -70,6 +71,9 @@ class DatabaseHandler:
                 content_tag = node.find(r'Downloadable/Content')
                 if content_tag is not None:
                     logging.info(r'<Content> has been found.')
+                    content_bytes = base64.b64decode(content_tag.text)
+                    content_string = content_bytes.decode()
+                    logging.debug(r'Convert base64 to string success.')
                     return True
         logging.debug(r'It seems this data has no <Content> node. Skip')
         return False
@@ -84,6 +88,10 @@ class DatabaseHandler:
             if result is None:
                 logging.warning(r"Can not find serial number!")
                 return
+            find_string = r'System SerialNumber="'
+            find_index = str(result).find(find_string)
+            self.System_SerialNo = str(result)[find_index+len(find_string):find_index+len(find_string)+6]
+            logging.info(self.System_SerialNo)
         except sqlite3.Error as e:
             logging.error(str(e))
         finally:
@@ -91,4 +99,4 @@ class DatabaseHandler:
 
 
 if __name__ == '__main__':
-    a = DatabaseHandler(r"E:\Programming\Python\Db2Xml4VA10A_Data\report.db")
+    a = DatabaseHandler(r"./data/report.db")
