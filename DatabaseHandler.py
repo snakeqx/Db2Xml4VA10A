@@ -23,18 +23,24 @@ logging.getLogger('').addHandler(console)
 class DatabaseHandler:
     Database_Name = 'report.db'
     System_SerialNo = ""
+    OutPut_Path = ""
 
-    def __init__(self, file_name):
+    def __init__(self, file_name, output_path = r'./'):
+        # deal with input database file
         if os.path.isfile(file_name):
             self.Database_Name = file_name
         else:
             logging.error(r'Can not find input file.')
             return
+        # connect to database
         self.Connection = sqlite3.connect(self.Database_Name)
         logging.debug(r'Database connected')
         self.get_serial_number()
-        for str_functions in StringFunctionTables:
-            self.read_data(str_functions)
+        # after get serial number, create/check the output path
+        if self.initial_output_path(output_path) == True:
+            # iterate the function tables to extract xml file
+            for str_functions in StringFunctionTables:
+                self.read_data(str_functions)
         self.Connection.close()
 
     def read_data(self, function_type):
@@ -49,7 +55,7 @@ class DatabaseHandler:
             sql_cursor.execute(sql_string, [function_type])
             result = sql_cursor.fetchone()
             if result is None:
-                logging.warning(function_type + r' with SUCCESS result has not been found.!!!!!!!!!!')
+                logging.debug(function_type + r' with SUCCESS result has not been found.!!!!!!!!!!')
                 return
             else:
                 while not self.parse_xml(result[0].decode()):
@@ -63,8 +69,7 @@ class DatabaseHandler:
         finally:
             sql_cursor.close()
 
-    @staticmethod
-    def parse_xml(xml_string):
+    def parse_xml(self, xml_string):
         xml_tree = ElementTree.fromstring(xml_string)
         for node in xml_tree:
             if node.tag == 'Chapter':
@@ -73,7 +78,12 @@ class DatabaseHandler:
                     logging.info(r'<Content> has been found.')
                     content_bytes = base64.b64decode(content_tag.text)
                     content_string = content_bytes.decode()
-                    logging.debug(r'Convert base64 to string success.')
+                    logging.info(content_string)
+                    if self.output_xml(content_string):
+                        logging.debug(r'Output file success.')
+                    else:
+                        logging.error(r'Output file error!')
+                        return False
                     return True
         logging.debug(r'It seems this data has no <Content> node. Skip')
         return False
@@ -96,6 +106,29 @@ class DatabaseHandler:
             logging.error(str(e))
         finally:
             sql_cursor.close()
+
+    def initial_output_path(self, path):
+        if os.path.isdir(path) == False:
+            logging.error(r'Output path is not correct!')
+            return False
+        self.OutPut_Path=os.path.join(path, self.System_SerialNo)
+        logging.debug(r'Output path='+str(self.OutPut_Path))
+        if os.path.exists(self.System_SerialNo):
+            logging.error(r'Already have the xml files, please back up manually!')
+            return False
+        os.mkdir(self.OutPut_Path)
+        return True
+
+    def output_xml(self, xml_string):
+        xml_tree = ElementTree.fromstring(xml_string)
+        for node in xml_tree:
+            if node.tag == r'SDCServiceReport':
+                print(node.attrib)
+        file_name = r'test.xml'
+        abs_file_name = os.path.join(self.OutPut_Path, file_name)
+        print(abs_file_name)
+        return True
+
 
 
 if __name__ == '__main__':
