@@ -62,4 +62,4 @@ StringFunctionTables = [
 ##############################################
 
 if __name__ == '__main__':
-    pass
+    print("please do not use it individually.")

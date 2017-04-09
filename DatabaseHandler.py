@@ -10,7 +10,7 @@ import base64
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                     datefmt='%a, %d %b %Y %H:%M:%S',
-                    filename=r'./log/DatabaseHandler.log',
+                    filename=r'./DatabaseHandler.log',
                     filemode='w')
 # define a stream that will show log level > Warning on screen also
 console = logging.StreamHandler()
@@ -131,4 +131,4 @@ class DatabaseHandler:
 
 
 if __name__ == '__main__':
-    a = DatabaseHandler(r"./data/report.db")
+    print("please do not use it individually.")

@@ -7,7 +7,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                     datefmt='%a, %d %b %Y %H:%M:%S',
-                    filename=r'.\log\DirectoryHandler.log',
+                    filename=r'.\DirectoryHandler.log',
                     filemode='w')
 # define a stream that will show log level > Warning on screen also
 console = logging.StreamHandler()
@@ -69,7 +69,5 @@ class DirectoryHandler:
 
 
 if __name__ == '__main__':
-    a = DirectoryHandler(r'./data/',
-                         "report.db")
-    print(a.Database_File_Path)
+    print("please do not use it individually.")
 
