@@ -1,12 +1,12 @@
 #!coding=utf8
-import os
 import logging
+import os
 
 
 class DirectoryHandler:
     """
-    这个类只用来遍历输入的目录并查找目录中的所有子目录下目标文件。
-    所有找到的目标文件路径都保存在Database_File_Path的列表中。
+    The class will iterate the input directory to find target database file.
+    And store each found database file full path in a list of string "Database_File_Path"
     """
     Database_File_Path = []
     Directory_Iterate = 1
@@ -16,7 +16,7 @@ class DirectoryHandler:
     def __init__(self, input_directory, target_to_find):
         """
         :param input_directory: 
-        :param target_to_find: 
+        :param target_to_find: target database file name
         """
         if input_directory is not None:
             if os.path.isdir(input_directory):
@@ -56,6 +56,7 @@ class DirectoryHandler:
 
 if __name__ == '__main__':
     print("please do not use it individually.")
+    # below codes for debug
     # define the logging config, output in file
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',

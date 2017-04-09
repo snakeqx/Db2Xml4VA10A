@@ -1,8 +1,9 @@
-import os
 import logging
+import os
 import sys
-from DirectoryHandler import DirectoryHandler
+
 from DatabaseHandler import DatabaseHandler
+from DirectoryHandler import DirectoryHandler
 
 # define the logging config, output in file
 logging.basicConfig(level=logging.DEBUG,
@@ -19,6 +20,12 @@ logging.getLogger('').addHandler(console)
 
 
 def main():
+    """
+    Main program to:
+    1. Call DirectoryHandler to get the list of string of all target database file
+    2. for each database file, it will call DatabaseHandler to generate xml file
+    :return: no return value
+    """
     logging.debug(r"here is the main program")
     file_name = 'report.db'
 

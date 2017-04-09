@@ -1,3 +1,9 @@
+"""
+In this script, only a list of string is defined.
+This is supposed to be the full list of activities in service mode that will be done in factory.
+Add more or delete as your interesting to save calculation time.
+"""
+
 StringFunctionTables = [
     "Adj_PHS",                              # 0
     "Adj_RSA",                              # 1

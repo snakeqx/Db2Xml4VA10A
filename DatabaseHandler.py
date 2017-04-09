@@ -1,18 +1,32 @@
 # -*- coding:utf-8 -*-
-import os
+import base64
 import logging
+import os
 import sqlite3
 from xml.etree import ElementTree
+
 from EnumFunctionTable import StringFunctionTables
-import base64
 
 
 class DatabaseHandler:
+    """
+    The class is to deal with sqlite3 database file.
+    It will do the job as below:
+    1. read the database
+    2. Find the target service function
+    3. Analyze if the target service function has a <content> which stores the xml file of the function result data
+    4. If <content> is found, extract the content.
+    5. convert the <content> with base64 decode and save to a xml file
+    """
     Database_Name = 'report.db'
     System_SerialNo = ""
     OutPut_Path = ""
 
     def __init__(self, file_name, output_path=r'./'):
+        """
+        :param file_name: database file name for analyze
+        :param output_path: the path of output xml files. default as ./
+        """
         # deal with input database file
         if os.path.isfile(file_name):
             self.Database_Name = file_name
@@ -35,6 +49,12 @@ class DatabaseHandler:
             self.Connection.close()
 
     def read_data(self, function_type):
+        """
+        read the data of target service function from database.
+        if the target service function has been found, it will call parse_xml function.
+        :param function_type: target service function name. Should be stored in EnumFunctionTable.py
+        :return: No return value.
+        """
         if function_type not in StringFunctionTables:
             logging.error(r'Function Type is not in EnumFunctionTable.py. Please configure it first or check spelling')
             return
@@ -61,6 +81,15 @@ class DatabaseHandler:
             sql_cursor.close()
 
     def parse_xml(self, xml_string, function_type):
+        """
+        the service function result is stored in the database in xml string format.
+        this function is try to analyze the xml string to see if has <content> node.
+        <content> node is a base64 encoded string which stores the detail result of the service function. 
+        e.g. actual value
+        :param xml_string: the stored xml string in database
+        :param function_type: target service function name. Should be stored in EnumFunctionTable.py
+        :return: boolean
+        """
         xml_tree = ElementTree.fromstring(xml_string)
         for node in xml_tree:
             if node.tag == 'Chapter':
@@ -79,6 +108,11 @@ class DatabaseHandler:
         return False
 
     def get_serial_number(self):
+        """
+        this function is to fill the class variable "System_SerialNo"
+        The system serial no will be used as the output folder name
+        :return: no return value
+        """
         logging.debug(r"It is now query for system serial number.")
         sql_cursor = self.Connection.cursor()
         sql_string = r"select data from servicereportstable order by starttime desc limit 1"
@@ -98,6 +132,12 @@ class DatabaseHandler:
             sql_cursor.close()
 
     def initial_output_path(self, path):
+        """
+        creates the output folder.
+        the folder name is "System_SerialNo"
+        :param path: where the folder of "System_SerialNo" should be put
+        :return: boolean
+        """
         if not os.path.isdir(path):
             logging.error(r'Output path is not correct!')
             return False
@@ -109,8 +149,14 @@ class DatabaseHandler:
         os.mkdir(self.OutPut_Path)
         return True
 
-    def output_xml(self, xml_string, function_type):
-        file_name = function_type+'.xml'
+    def output_xml(self, xml_string, output_file_name):
+        """
+        to save the <content> node in a xml file in the output folder.
+        :param xml_string: The string of <content> which includes the detailed service function result.
+        :param output_file_name: the file name that will be saved. actually the function name is used. 
+        :return: boolean
+        """
+        file_name = output_file_name + '.xml'
         abs_file_name = os.path.abspath(os.path.join(self.OutPut_Path, file_name))
         try:
             fp = open(abs_file_name, 'w')
@@ -125,6 +171,7 @@ class DatabaseHandler:
 
 if __name__ == '__main__':
     print("please do not use it individually.")
+    # belows codes for debug
     # define the logging config, output in file
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
