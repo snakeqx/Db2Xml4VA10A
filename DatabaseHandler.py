@@ -20,15 +20,19 @@ class DatabaseHandler:
             logging.error(r'Can not find input file.')
             return
         # connect to database
-        self.Connection = sqlite3.connect(self.Database_Name)
-        logging.debug(r'Database connected')
-        self.get_serial_number()
-        # after get serial number, create/check the output path
-        if self.initial_output_path(output_path):
-            # iterate the function tables to extract xml file
-            for str_functions in StringFunctionTables:
-                self.read_data(str_functions)
-        self.Connection.close()
+        try:
+            self.Connection = sqlite3.connect(self.Database_Name)
+            logging.debug(r'Database connected')
+            self.get_serial_number()
+            # after get serial number, create/check the output path
+            if self.initial_output_path(output_path):
+                # iterate the function tables to extract xml file
+                for str_functions in StringFunctionTables:
+                    self.read_data(str_functions)
+        except Exception as e:
+            logging.error(str(e))
+        finally:
+            self.Connection.close()
 
     def read_data(self, function_type):
         if function_type not in StringFunctionTables:
@@ -48,7 +52,7 @@ class DatabaseHandler:
                 while not self.parse_xml(result[0].decode(), function_type):
                     result = sql_cursor.fetchone()
                     if result is None:
-                        logging.debug(function_type + r' has no <Content>, please double check!')
+                        logging.warning(function_type + r' has no <Content>, please double check!')
                         break
                 logging.info(r'Read data successfully.')
         except sqlite3.Error as e:

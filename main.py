@@ -8,7 +8,7 @@ from DatabaseHandler import DatabaseHandler
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
                     datefmt='%a, %d %b %Y %H:%M:%S',
-                    filename=r'.\main.log',
+                    filename=r'./log/main.log',
                     filemode='w')
 # define a stream that will show log level > Warning on screen also
 console = logging.StreamHandler()
@@ -20,16 +20,11 @@ logging.getLogger('').addHandler(console)
 
 def main():
     logging.debug(r"here is the main program")
-    file_name='report.db'
-    # if only call the script, will use ./a.dcm as input
-    if len(sys.argv) == 1 or len(sys.argv) > 3:
-        print("Use the script as below:")
-        print("python(3) main.py [filename]|[folder name]")
-        print("if filename is not given, it will use default as 'report.db'")
-        print("folder name is mandatory.")
+    file_name = 'report.db'
+
     # if with 1 parameter
-    elif len(sys.argv) == 2:
-        logging.debug(r"Program has 1 parameters.")
+    if len(sys.argv) == 2:
+        print(r"Program has 1 parameters. Now it is assumed the given para is 'folder name'")
         if os.path.isdir(sys.argv[1]):
             folder_name = os.path.abspath(sys.argv[1])
             directory_handler = DirectoryHandler(folder_name, file_name)
@@ -40,8 +35,24 @@ def main():
             print(r"The parameter seems not a folder, please double check")
             return
     # if with 2 parameters
-    elif len(sys.argv) == 3:
-        pass
+    elif len(sys.argv) == 4:
+        print(r"Program has 3 parameters.")
+        file_name = sys.argv[1]
+        if os.path.isdir(sys.argv[2]) and os.path.isdir(sys.argv[3]):
+            folder_name = os.path.abspath(sys.argv[2])
+            output_name = os.path.abspath(sys.argv[3])
+            directory_handler = DirectoryHandler(folder_name, file_name)
+            if directory_handler.Database_File_Path is None:
+                print(r"No target file found. Please double check. Reversed parameters?")
+                return
+            for db in directory_handler.Database_File_Path:
+                DatabaseHandler(db, output_path=output_name)
+    else:
+        print("Use the script as below:")
+        print("python(3) main.py [filename] [folder name] [output path]")
+        print("[filename] if filename is not given, it will use default as 'report.db'")
+        print("[folder name] folder name is mandatory.")
+        print("[output path] if output path is not given, it will use default as './'")
 
 
 if __name__ == '__main__':
