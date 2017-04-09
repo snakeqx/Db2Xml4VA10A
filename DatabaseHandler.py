@@ -25,7 +25,7 @@ class DatabaseHandler:
     System_SerialNo = ""
     OutPut_Path = ""
 
-    def __init__(self, file_name, output_path = r'./'):
+    def __init__(self, file_name, output_path=r'./'):
         # deal with input database file
         if os.path.isfile(file_name):
             self.Database_Name = file_name
@@ -37,7 +37,7 @@ class DatabaseHandler:
         logging.debug(r'Database connected')
         self.get_serial_number()
         # after get serial number, create/check the output path
-        if self.initial_output_path(output_path) == True:
+        if self.initial_output_path(output_path):
             # iterate the function tables to extract xml file
             for str_functions in StringFunctionTables:
                 self.read_data(str_functions)
@@ -108,10 +108,10 @@ class DatabaseHandler:
             sql_cursor.close()
 
     def initial_output_path(self, path):
-        if os.path.isdir(path) == False:
+        if not os.path.isdir(path):
             logging.error(r'Output path is not correct!')
             return False
-        self.OutPut_Path=os.path.join(path, self.System_SerialNo)
+        self.OutPut_Path = os.path.join(path, self.System_SerialNo)
         logging.debug(r'Output path='+str(self.OutPut_Path))
         if os.path.exists(self.System_SerialNo):
             logging.error(r'Already have the xml files, please back up manually!')
@@ -128,7 +128,6 @@ class DatabaseHandler:
         abs_file_name = os.path.join(self.OutPut_Path, file_name)
         print(abs_file_name)
         return True
-
 
 
 if __name__ == '__main__':
