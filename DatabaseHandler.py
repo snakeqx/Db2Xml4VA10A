@@ -45,7 +45,7 @@ class DatabaseHandler:
                 logging.debug(function_type + r' with SUCCESS result has not been found.!!!!!!!!!!')
                 return
             else:
-                while not self.parse_xml(result[0].decode()):
+                while not self.parse_xml(result[0].decode(), function_type):
                     result = sql_cursor.fetchone()
                     if result is None:
                         logging.debug(function_type + r' has no <Content>, please double check!')
@@ -56,7 +56,7 @@ class DatabaseHandler:
         finally:
             sql_cursor.close()
 
-    def parse_xml(self, xml_string):
+    def parse_xml(self, xml_string, function_type):
         xml_tree = ElementTree.fromstring(xml_string)
         for node in xml_tree:
             if node.tag == 'Chapter':
@@ -65,8 +65,7 @@ class DatabaseHandler:
                     logging.info(r'<Content> has been found.')
                     content_bytes = base64.b64decode(content_tag.text)
                     content_string = content_bytes.decode()
-                    logging.info(content_string)
-                    if self.output_xml(content_string):
+                    if self.output_xml(content_string, function_type):
                         logging.debug(r'Output file success.')
                     else:
                         logging.error(r'Output file error!')
@@ -106,14 +105,17 @@ class DatabaseHandler:
         os.mkdir(self.OutPut_Path)
         return True
 
-    def output_xml(self, xml_string):
-        xml_tree = ElementTree.fromstring(xml_string)
-        for node in xml_tree:
-            if node.tag == r'SDCServiceReport':
-                print(node.attrib)
-        file_name = r'test.xml'
-        abs_file_name = os.path.join(self.OutPut_Path, file_name)
-        print(abs_file_name)
+    def output_xml(self, xml_string, function_type):
+        file_name = function_type+'.xml'
+        abs_file_name = os.path.abspath(os.path.join(self.OutPut_Path, file_name))
+        try:
+            fp = open(abs_file_name, 'w')
+            fp.write(xml_string)
+            logging.info(abs_file_name + " write success!!")
+        except Exception as e:
+            logging.error(str(e))
+        finally:
+            fp.close()
         return True
 
 
