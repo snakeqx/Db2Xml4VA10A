@@ -41,6 +41,9 @@ def main():
         else:
             print(r"The parameter seems not a folder, please double check")
             return
+    if len(sys.argv) == 3:
+        print(r"Program has 2 paramters, which is confusing. Program exits.")
+        return
     # if with 2 parameters
     elif len(sys.argv) == 4:
         print(r"Program has 3 parameters.")
