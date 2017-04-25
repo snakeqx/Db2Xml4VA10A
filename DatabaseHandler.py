@@ -97,8 +97,7 @@ class DatabaseHandler:
                 if content_tag is not None:
                     logging.info(r'<Content> has been found.')
                     content_bytes = base64.b64decode(content_tag.text)
-                    content_string = content_bytes.decode()
-                    if self.output_xml(content_string, function_type):
+                    if self.output_xml(content_bytes, function_type):
                         logging.debug(r'Output file success.')
                     else:
                         logging.error(r'Output file error!')
@@ -149,18 +148,18 @@ class DatabaseHandler:
         os.mkdir(self.OutPut_Path)
         return True
 
-    def output_xml(self, xml_string, output_file_name):
+    def output_xml(self, xml_bytes, output_file_name):
         """
         to save the <content> node in a xml file in the output folder.
-        :param xml_string: The string of <content> which includes the detailed service function result.
+        :param xml_bytes: The string of <content> which includes the detailed service function result.
         :param output_file_name: the file name that will be saved. actually the function name is used. 
         :return: boolean
         """
         file_name = output_file_name + '.xml'
         abs_file_name = os.path.abspath(os.path.join(self.OutPut_Path, file_name))
         try:
-            fp = open(abs_file_name, 'w')
-            fp.write(xml_string)
+            fp = open(abs_file_name, 'wb')
+            fp.write(xml_bytes)
             logging.info(abs_file_name + " write success!!")
         except Exception as e:
             logging.error(str(e))

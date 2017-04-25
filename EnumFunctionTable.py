@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 """
 In this script, only a list of string is defined.
 This is supposed to be the full list of activities in service mode that will be done in factory.
