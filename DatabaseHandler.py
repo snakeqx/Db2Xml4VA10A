@@ -105,7 +105,8 @@ class DatabaseHandler:
                         logging.error(r'Output file error!')
                         return False
                     return True
-        logging.debug(r'It seems this data has no <Content> node. Skip')
+        logging.debug(r'It seems this data has no <Content> node. directly save xml file')
+        self.output_xml(xml_string.encode(), function_type, start_time, "No_SDCReport")
         return False
 
     def get_serial_number(self):
@@ -150,15 +151,16 @@ class DatabaseHandler:
         os.mkdir(self.OutPut_Path)
         return True
 
-    def output_xml(self, xml_bytes, output_file_name, start_time):
+    def output_xml(self, xml_bytes, output_file_name, start_time, comment: str=''):
         """
         to save the <content> node in a xml file in the output folder.
+        :param comment: Add a string to describe the xml file is not from SDC report
         :param start_time: the start time parsed from attribute of element tree root 
         :param xml_bytes: The string of <content> which includes the detailed service function result.
         :param output_file_name: the file name that will be saved. actually the function name is used. 
         :return: boolean
         """
-        file_name = output_file_name + str(start_time) + '.xml'
+        file_name = output_file_name + str(start_time) + comment + '.xml'
         file_name = file_name.replace(':', ';')
         abs_file_name = os.path.abspath(os.path.join(self.OutPut_Path, file_name))
         try:
