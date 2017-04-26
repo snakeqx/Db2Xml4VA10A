@@ -64,17 +64,18 @@ class DatabaseHandler:
                      r"order by starttime desc"
         try:
             sql_cursor.execute(sql_string, [function_type])
-            result = sql_cursor.fetchone()
+            result = sql_cursor.fetchall()
             if result is None:
                 logging.debug(function_type + r' with SUCCESS result has not been found.!!!!!!!!!!')
                 return
             else:
-                while not self.parse_xml(result[0].decode(), function_type):
-                    result = sql_cursor.fetchone()
-                    if result is None:
-                        logging.warning(function_type + r' has no <Content>, please double check!')
-                        break
-                logging.info(r'Read data successfully.')
+                for data in result:
+                    while not self.parse_xml(data[0].decode(), function_type):
+                        result = sql_cursor.fetchone()
+                        if result is None:
+                            logging.warning(function_type + r' has no <Content>, please double check!')
+                            break
+                    logging.info(r'Read data successfully.')
         except sqlite3.Error as e:
             logging.error(str(e))
         finally:
@@ -91,13 +92,14 @@ class DatabaseHandler:
         :return: boolean
         """
         xml_tree = ElementTree.fromstring(xml_string)
+        start_time = xml_tree.attrib['StartTime']
         for node in xml_tree:
             if node.tag == 'Chapter':
                 content_tag = node.find(r'Downloadable/Content')
                 if content_tag is not None:
                     logging.info(r'<Content> has been found.')
                     content_bytes = base64.b64decode(content_tag.text)
-                    if self.output_xml(content_bytes, function_type):
+                    if self.output_xml(content_bytes, function_type, start_time):
                         logging.debug(r'Output file success.')
                     else:
                         logging.error(r'Output file error!')
@@ -148,14 +150,16 @@ class DatabaseHandler:
         os.mkdir(self.OutPut_Path)
         return True
 
-    def output_xml(self, xml_bytes, output_file_name):
+    def output_xml(self, xml_bytes, output_file_name, start_time):
         """
         to save the <content> node in a xml file in the output folder.
+        :param start_time: the start time parsed from attribute of element tree root 
         :param xml_bytes: The string of <content> which includes the detailed service function result.
         :param output_file_name: the file name that will be saved. actually the function name is used. 
         :return: boolean
         """
-        file_name = output_file_name + '.xml'
+        file_name = output_file_name + str(start_time) + '.xml'
+        file_name = file_name.replace(':', ';')
         abs_file_name = os.path.abspath(os.path.join(self.OutPut_Path, file_name))
         try:
             fp = open(abs_file_name, 'wb')

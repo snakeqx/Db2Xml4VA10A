@@ -6,13 +6,13 @@ Add more or delete as your interesting to save calculation time.
 """
 
 StringFunctionTables = [
-    "Adj_PHS",                              # 0
-    "Adj_RSA",                              # 1
-    "Adj_FAD",                              # 2
-    "Adj_GET",                              # 3
-    "Adj_ZAD",                              # 4
-    "Tbg_DefChan",                          # 5
-    "Adj_FAL",                              # 6
+    "Adj_RSA",
+    "Adj_PHS",
+    "Adj_FAD",
+    "Adj_GET",
+    "Adj_ZAD",
+    "Tbg_DefChan",
+    "Adj_FAL",
     "Adj_GAD",
     "Adj_DSC",
     "Tbg_AirCal",
